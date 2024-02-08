@@ -1,4 +1,9 @@
-import { getBankAccount, InsufficientFundsError, TransferFailedError } from '.';
+import {
+  getBankAccount,
+  InsufficientFundsError,
+  TransferFailedError,
+  SynchronizationFailedError,
+} from '.';
 
 describe('BankAccount', () => {
   const INITIAL_BALANCE = 5000;
@@ -8,6 +13,10 @@ describe('BankAccount', () => {
 
   beforeEach(() => {
     bankAccount = getBankAccount(INITIAL_BALANCE);
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
   });
 
   test('should create account with initial balance', () => {
@@ -64,13 +73,35 @@ describe('BankAccount', () => {
     expect(bankAccountTo.getBalance()).toBe(INITIAL_BALANCE + OPERATION_AMOUNT);
   });
 
-  // test('fetchBalance should return number in case if request did not failed', async () => {});
+  test('fetchBalance should return number in case if request did not failed', async () => {
+    jest
+      .spyOn(bankAccount, 'fetchBalance')
+      .mockReturnValueOnce(Promise.resolve(OPERATION_AMOUNT));
 
-  // test('should set new balance if fetchBalance returned number', async () => {
-  //   // Write your tests here
-  // });
+    const fetchBalanceResult = await bankAccount.fetchBalance();
 
-  // test('should throw SynchronizationFailedError if fetchBalance returned null', async () => {
-  //   // Write your tests here
-  // });
+    expect(typeof fetchBalanceResult).toBe('number');
+  });
+
+  test('should set new balance if fetchBalance returned number', async () => {
+    jest
+      .spyOn(bankAccount, 'fetchBalance')
+      .mockReturnValueOnce(Promise.resolve(OPERATION_AMOUNT));
+
+    await bankAccount.synchronizeBalance();
+
+    expect(bankAccount.getBalance()).toBe(OPERATION_AMOUNT);
+  });
+
+  test('should throw SynchronizationFailedError if fetchBalance returned null', async () => {
+    jest
+      .spyOn(bankAccount, 'fetchBalance')
+      .mockReturnValueOnce(Promise.resolve(null));
+
+    await expect(() => bankAccount.synchronizeBalance()).rejects.toThrow(
+      SynchronizationFailedError,
+    );
+
+    expect(bankAccount.getBalance()).toBe(INITIAL_BALANCE);
+  });
 });
