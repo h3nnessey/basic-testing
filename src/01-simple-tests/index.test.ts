@@ -32,7 +32,7 @@ describe('simpleCalculator tests', () => {
   });
 
   test('should return null for invalid action', () => {
-    const rawInput = { a: 5, b: 5, action: null };
+    const rawInput = { a: 5, b: 5, action: '*****' };
 
     expect(simpleCalculator(rawInput)).toBeNull();
   });
