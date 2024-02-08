@@ -18,7 +18,9 @@ type ValidCalculatorInput = {
   action: Action;
 };
 
-export const simpleCalculator = (rawInput: RawCalculatorInput): number | null => {
+export const simpleCalculator = (
+  rawInput: RawCalculatorInput,
+): number | null => {
   if (isInputValid(rawInput)) {
     const { a, b, action } = rawInput;
 
@@ -41,7 +43,9 @@ export const simpleCalculator = (rawInput: RawCalculatorInput): number | null =>
   return null;
 };
 
-const isInputValid = (input: RawCalculatorInput): input is ValidCalculatorInput => {
+const isInputValid = (
+  input: RawCalculatorInput,
+): input is ValidCalculatorInput => {
   const { a, b, action } = input;
 
   const actionValid = Object.values(Action).includes(action as Action);
