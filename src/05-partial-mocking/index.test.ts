@@ -16,6 +16,9 @@ jest.mock('./index', () => {
 describe('partial mocking', () => {
   afterAll(() => {
     jest.unmock('./index');
+  });
+
+  afterEach(() => {
     jest.resetAllMocks();
   });
 
