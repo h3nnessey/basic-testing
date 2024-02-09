@@ -1,4 +1,7 @@
-import { doStuffByTimeout, doStuffByInterval } from '.';
+import path from 'node:path';
+import fs from 'node:fs';
+import fsp from 'node:fs/promises';
+import { doStuffByTimeout, doStuffByInterval, readFileAsynchronously } from '.';
 
 describe('doStuffByTimeout', () => {
   const MOCKED_CALLBACK = jest.fn();
@@ -10,7 +13,7 @@ describe('doStuffByTimeout', () => {
 
   afterEach(() => {
     jest.clearAllTimers();
-    jest.resetAllMocks();
+    jest.restoreAllMocks();
   });
 
   beforeAll(() => {
@@ -52,7 +55,7 @@ describe('doStuffByInterval', () => {
 
   afterEach(() => {
     jest.clearAllTimers();
-    jest.resetAllMocks();
+    jest.restoreAllMocks();
   });
 
   beforeAll(() => {
@@ -83,10 +86,44 @@ describe('doStuffByInterval', () => {
   });
 });
 
-// describe('readFileAsynchronously', () => {
-//   test('should call join with pathToFile', async () => {});
+describe('readFileAsynchronously', () => {
+  const PATH_TO_FILE = './text.txt';
+  const FILE_CONTENT =
+    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum, eveniet.\n';
 
-//   test('should return null if file does not exist', async () => {});
+  beforeEach(() => {
+    jest
+      .spyOn(path, 'join')
+      .mockImplementation((...args: string[]) => args.join('/'));
 
-//   test('should return file content if file exists', async () => {});
-// });
+    jest.spyOn(fsp, 'readFile').mockImplementation(async () => FILE_CONTENT);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  test('should call join with pathToFile', async () => {
+    const joinSpy = jest.spyOn(path, 'join');
+
+    jest.spyOn(fs, 'existsSync').mockImplementation(() => false);
+
+    await readFileAsynchronously(PATH_TO_FILE);
+
+    expect(joinSpy.mock.calls.at(0)).toContain(PATH_TO_FILE);
+  });
+
+  test('should return null if file does not exist', async () => {
+    jest.spyOn(fs, 'existsSync').mockImplementation(() => false);
+
+    await expect(readFileAsynchronously(PATH_TO_FILE)).resolves.toBeNull();
+  });
+
+  test('should return file content if file exists', async () => {
+    jest.spyOn(fs, 'existsSync').mockImplementation(() => true);
+
+    await expect(readFileAsynchronously(PATH_TO_FILE)).resolves.toBe(
+      FILE_CONTENT,
+    );
+  });
+});

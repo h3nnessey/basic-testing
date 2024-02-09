@@ -19,7 +19,7 @@ describe('partial mocking', () => {
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.restoreAllMocks();
   });
 
   test('mockOne, mockTwo, mockThree should not log into console', () => {
