@@ -96,7 +96,7 @@ describe('readFileAsynchronously', () => {
       .spyOn(path, 'join')
       .mockImplementation((...args: string[]) => args.join('/'));
 
-    jest.spyOn(fsp, 'readFile').mockImplementation(async () => FILE_CONTENT);
+    jest.spyOn(fsp, 'readFile').mockResolvedValue(FILE_CONTENT);
   });
 
   afterEach(() => {
@@ -106,7 +106,7 @@ describe('readFileAsynchronously', () => {
   test('should call join with pathToFile', async () => {
     const joinSpy = jest.spyOn(path, 'join');
 
-    jest.spyOn(fs, 'existsSync').mockImplementation(() => false);
+    jest.spyOn(fs, 'existsSync').mockReturnValueOnce(false);
 
     await readFileAsynchronously(PATH_TO_FILE);
 
@@ -114,13 +114,13 @@ describe('readFileAsynchronously', () => {
   });
 
   test('should return null if file does not exist', async () => {
-    jest.spyOn(fs, 'existsSync').mockImplementation(() => false);
+    jest.spyOn(fs, 'existsSync').mockReturnValueOnce(false);
 
     await expect(readFileAsynchronously(PATH_TO_FILE)).resolves.toBeNull();
   });
 
   test('should return file content if file exists', async () => {
-    jest.spyOn(fs, 'existsSync').mockImplementation(() => true);
+    jest.spyOn(fs, 'existsSync').mockReturnValueOnce(true);
 
     await expect(readFileAsynchronously(PATH_TO_FILE)).resolves.toBe(
       FILE_CONTENT,

@@ -10,7 +10,7 @@ describe('resolveValue', () => {
   test('should resolve provided value', async () => {
     const value = { id: 5, name: '5' };
 
-    await expect(resolveValue(value)).resolves.toEqual(value);
+    await expect(resolveValue(value)).resolves.toStrictEqual(value);
   });
 });
 

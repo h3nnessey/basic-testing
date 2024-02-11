@@ -48,6 +48,7 @@ describe('throttledGetDataFromApi', () => {
     await throttledGetDataFromApi(RELATIVE_PATH);
 
     jest.runAllTimers();
+
     expect(getSpy).toHaveBeenCalledWith(RELATIVE_PATH);
   });
 
